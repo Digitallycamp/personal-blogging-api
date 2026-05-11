@@ -7,6 +7,7 @@ import { catRoute } from './routes/cat.routes.js';
 import helmet from 'helmet';
 import cors from 'cors';
 import { articleRoutes } from './routes/article.routes.js';
+import { newsletterRouter } from './routes/newsletter.routes.js';
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -27,5 +28,6 @@ app.get('/', (req, res) => {
 app.use('/api/v1/aboutme', aboutRouter);
 app.use('/api/v1/article', articleRoutes);
 app.use('/api/v1/cat', catRoute);
+app.use('/api/v1/newsletter', newsletterRouter);
 
 app.use(erroMiddleware);
