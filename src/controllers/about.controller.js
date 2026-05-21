@@ -35,6 +35,23 @@ export const createAboutMe = async (req, res) => {
 	}
 };
 
+export const getData = async (req, res) => {
+	try {
+		const aboutData = await aboutServices.getData();
+		return res.status(StatusCodes.OK).json({
+			sucess: true,
+			status: StatusCodes.OK,
+			message: 'About Me fetched successfully',
+			data: aboutData,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			sucess: false,
+			status: StatusCodes.INTERNAL_SERVER_ERROR,
+			message: error.message,
+		});
+	}
+};
 export const deleteData = async (req, res) => {
 	console.log('hshhs', req.body);
 	const { email } = req.params;

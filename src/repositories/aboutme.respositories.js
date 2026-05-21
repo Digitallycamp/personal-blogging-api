@@ -14,6 +14,16 @@ export const aboutServices = {
 			throw new Error(`Service Error`, error.message);
 		}
 	},
+	getData: async () => {
+		try {
+			const aboutData = await AboutModel.find({});
+
+			return aboutData;
+		} catch (error) {
+			throw new Error(`Service Error`, error.message);
+		}
+	},
+
 	delete: async (email) => {
 		console.log(email);
 		try {

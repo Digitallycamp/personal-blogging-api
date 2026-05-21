@@ -1,7 +1,12 @@
 import express from 'express';
-import { createAboutMe, deleteData } from '../controllers/about.controller.js';
+import {
+	createAboutMe,
+	deleteData,
+	getData,
+} from '../controllers/about.controller.js';
 
 export const aboutRouter = express.Router();
 
-aboutRouter.post('/create', createAboutMe);
+aboutRouter.get('/', getData);
+aboutRouter.patch('/create', createAboutMe);
 aboutRouter.delete('/remove/:email', deleteData);
