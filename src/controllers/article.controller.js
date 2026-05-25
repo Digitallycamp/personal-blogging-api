@@ -1,103 +1,161 @@
 import { StatusCodes } from 'http-status-codes';
 import { articleServices } from '../repositories/article.repositories.js';
 
-export const articleController = async (req, res) => {
-	const { title, description, category } = req.body;
-	console.log(req.body);
-	try {
-		if (!title || !category || !description) {
-			return res
-				.status(StatusCodes.BAD_REQUEST)
-				.json({ status: false, message: 'Fields can not be empty' });
-		}
+export const createArticleController = async (req, res) => {
+    const { title, description, content, category, tags, featuredImage, author } = req.body;
+    
+    try {
+        if (!title || !category || !description || !content) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ 
+                success: false, 
+                message: 'Title, category, description and content are required' 
+            });
+        }
 
-		const newData = await articleServices.create({
-			title,
-			category,
-			description,
-		});
+        const newArticle = await articleServices.create({
+            title,
+            category,
+            description,
+            content,
+            tags: tags || [],
+            featuredImage: featuredImage || '',
+            author: author || 'Admin'
+        });
 
-		return res.status(StatusCodes.CREATED).json({
-			status: true,
-			message: 'Arrticle created succesfully!',
-			data: newData,
-		});
-	} catch (error) {
-		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-			sucess: false,
-			status: StatusCodes.INTERNAL_SERVER_ERROR,
-			message: error.message,
-		});
-	}
+        return res.status(StatusCodes.CREATED).json({
+            success: true,
+            message: 'Article created successfully!',
+            data: newArticle,
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: error.message,
+        });
+    }
 };
 
-export const getAllArticleController = async (req, res) => {
-	try {
-		const articles = await articleServices.getAll();
-
-		return res.status(StatusCodes.OK).json({
-			status: true,
-			message: 'Arrticles retrived succesfully!',
-			data: articles,
-		});
-	} catch (error) {
-		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-			sucess: false,
-			status: StatusCodes.INTERNAL_SERVER_ERROR,
-			message: error.message,
-		});
-	}
+export const getAllArticlesController = async (req, res) => {
+    try {
+        const articles = await articleServices.getAll();
+        
+        return res.status(StatusCodes.OK).json({
+            success: true,
+            message: 'Articles retrieved successfully!',
+            count: articles.length,
+            data: articles,
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: error.message,
+        });
+    }
 };
+
 export const getArticleController = async (req, res) => {
-	const id = req.params.id;
-	try {
-		// db here
-		const article = await articleServices.getArticle(id);
-		return res.status(StatusCodes.OK).json({
-			status: true,
-			message: 'Article retrived succesfully!',
-			data: article,
-		});
-	} catch (error) {
-		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-			sucess: false,
-			status: StatusCodes.INTERNAL_SERVER_ERROR,
-			message: error.message,
-		});
-	}
+    const { id } = req.params;
+    
+    try {
+        const article = await articleServices.getArticle(id);
+        
+        
+        if (article) {
+            article.viewCount += 1;
+            await article.save();
+        }
+        
+        return res.status(StatusCodes.OK).json({
+            success: true,
+            message: 'Article retrieved successfully!',
+            data: article,
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: error.message,
+        });
+    }
 };
+
+export const getArticleBySlugController = async (req, res) => {
+    const { slug } = req.params;
+    
+    try {
+        const article = await articleServices.getArticleBySlug(slug);
+        
+        
+        if (article) {
+            article.viewCount += 1;
+            await article.save();
+        }
+        
+        return res.status(StatusCodes.OK).json({
+            success: true,
+            message: 'Article retrieved successfully!',
+            data: article,
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+export const getArticlesByCategoryController = async (req, res) => {
+    const { categoryId } = req.params;
+    
+    try {
+        const articles = await articleServices.getArticlesByCategory(categoryId);
+        
+        return res.status(StatusCodes.OK).json({
+            success: true,
+            message: 'Articles retrieved successfully!',
+            count: articles.length,
+            data: articles,
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 export const updateArticleController = async (req, res) => {
-	const id = req.params.id;
-	try {
-		// tal top db
-		const article = await articleServices.updateArticle(id);
-		return res.status(StatusCodes.CREATED).json({
-			status: true,
-			message: 'Arrticle updated succesfully!',
-			data: article,
-		});
-	} catch (error) {
-		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-			sucess: false,
-			status: StatusCodes.INTERNAL_SERVER_ERROR,
-			message: error.message,
-		});
-	}
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    try {
+        const article = await articleServices.updateArticle(id, updateData);
+        
+        return res.status(StatusCodes.OK).json({
+            success: true,
+            message: 'Article updated successfully!',
+            data: article,
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: error.message,
+        });
+    }
 };
+
 export const deleteArticleController = async (req, res) => {
-	const id = req.params.id;
-	try {
-		// tal top db
-		await articleServices.deleteArticle(id);
-		return res.status(StatusCodes.CREATED).json({
-			status: true,
-			message: 'Arrticle deleted succesfully!',
-		});
-	} catch (error) {
-		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-			sucess: false,
-			status: StatusCodes.INTERNAL_SERVER_ERROR,
-			message: error.message,
-		});
-	}
+    const { id } = req.params;
+    
+    try {
+        await articleServices.deleteArticle(id);
+        return res.status(StatusCodes.OK).json({
+            success: true,
+            message: 'Article deleted successfully!',
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: error.message,
+        });
+    }
 };
