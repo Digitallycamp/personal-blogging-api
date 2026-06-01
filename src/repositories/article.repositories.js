@@ -1,12 +1,42 @@
 import { ArticleModel } from '../models/article.model.js';
 
+function generateSlug(title) {
+	return title
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-|-$/g, '');
+}
+
 export const articleServices = {
 	create: async (article) => {
 		try {
-			const newArticle = new ArticleModel(article);
+			
+			console.log('Creating article with data:', article);
+			
+			let baseSlug = generateSlug(article.title);
+			let slug = baseSlug;
+			let counter = 1;
+			
+			while (true) {
+				const existingArticle = await ArticleModel.findOne({ slug });
+				if (!existingArticle) break;
+				slug = `${baseSlug}-${counter}`;
+				counter++;
+			}
+			
+			const articleWithSlug = {
+				...article,
+				slug: slug
+			};
+			
+			const newArticle = new ArticleModel(articleWithSlug);
 			await newArticle.save();
+			
 			await newArticle.populate('category');
+			
+			console.log('Article saved successfully:', newArticle);
 			return newArticle;
+			
 		} catch (error) {
 			console.log(error);
 			throw new Error(`Service Error: ${error.message}`);
