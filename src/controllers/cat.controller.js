@@ -27,3 +27,20 @@ export const catController = async (req, res) => {
 		});
 	}
 };
+
+
+export const getCategoriesController = async (req, res) => {
+	try {
+		const categories = await catServices.getAll();
+
+		return res.status(StatusCodes.OK).json({
+			success: true,
+			data: categories,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			success: false,
+			message: error.message,
+		});
+	}
+};

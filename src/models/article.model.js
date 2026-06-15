@@ -7,11 +7,10 @@ const articleSchema = Schema({
         trim: true
     },
     slug: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true
+    type: String,
+    unique: true,
+    lowercase: true,
+    trim: true
     },
     description: {
         type: String,
@@ -47,14 +46,13 @@ const articleSchema = Schema({
 });
 
 
-articleSchema.pre('save', function(next) {
+articleSchema.pre('save', function () {
     if (this.isModified('title')) {
         this.slug = this.title
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-|-$/g, '');
     }
-    next();
 });
 
 export const ArticleModel = model('Article', articleSchema);

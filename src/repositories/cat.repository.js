@@ -11,4 +11,12 @@ export const catServices = {
 			throw new Error(`Service Error`, error.message);
 		}
 	},
+	getAll: async () => {
+		try {
+			return await CatModel.find({});
+		} catch (error) {
+			throw new Error(`Service Error: ${error.message}`);
+		}
+	},
 };
+
