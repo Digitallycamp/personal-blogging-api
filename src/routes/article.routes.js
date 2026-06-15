@@ -9,6 +9,8 @@ import {
 	deleteArticleController
 } from '../controllers/article.controller.js';
 
+import { auth } from '../middleware/auth.middleware.js';
+
 export const articleRoutes = express.Router();
 
 
@@ -17,6 +19,6 @@ articleRoutes.get('/slug/:slug', getArticleBySlugController);
 articleRoutes.get('/category/:categoryId', getArticlesByCategoryController);
 articleRoutes.get('/:id', getArticleController);
 
-articleRoutes.post('/', createArticleController);
-articleRoutes.patch('/:id', updateArticleController);
-articleRoutes.delete('/:id', deleteArticleController);
+articleRoutes.post('/', auth, createArticleController);
+articleRoutes.patch('/:id', auth, updateArticleController);
+articleRoutes.delete('/:id', auth, deleteArticleController);
